@@ -129,7 +129,9 @@ function calculateIndicators(candles) {
 
     rsi5: formatNum(lastValue(ti.RSI.calculate({ period: 5, values: close }))),
     rsi14: formatNum(lastValue(ti.RSI.calculate({ period: 14, values: close }))),
-  };
+
+ atr14: formatNum(lastValue(ti.ATR.calculate({ high, low, close, period: 14 }))),
+  obv: formatNum(lastValue(ti.OBV.calculate({ close, volume }))),
 }
 
 // --- Output Message Generator ---
