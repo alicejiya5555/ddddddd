@@ -11,15 +11,22 @@ const PORT = process.env.PORT || 3000;
 // --- Utility Functions ---
 function parseCommand(command) {
   const cmd = command.toLowerCase();
-  const match = cmd.match(/^\/(\w+)(\d+)(m|h)$/);
+  const match = cmd.match(/^\/(eth|btc|link)(\d{1,2})(m|h)$/);
   if (!match) return null;
+
   const [, symbolRaw, intervalNum, intervalUnit] = match;
-  const symbol = symbolRaw === "eth" ? "ETHUSDT"
-    : symbolRaw === "btc" ? "BTCUSDT"
-    : symbolRaw === "link" ? "LINKUSDT"
-    : null;
+  const symbol = {
+    eth: "ETHUSDT",
+    btc: "BTCUSDT",
+    link: "LINKUSDT"
+  }[symbolRaw];
+
   if (!symbol) return null;
+
+  const validIntervals = ["15m", "1h", "4h", "12h", "24h"];
   const interval = `${intervalNum}${intervalUnit}`;
+  if (!validIntervals.includes(interval)) return null;
+
   return { symbol, interval };
 }
 
