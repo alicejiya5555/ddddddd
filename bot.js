@@ -132,6 +132,7 @@ function calculateIndicators(candles) {
 
  atr14: formatNum(lastValue(ti.ATR.calculate({ high, low, close, period: 14 }))),
   obv: formatNum(lastValue(ti.OBV.calculate({ close, volume }))),
+  });
 }
 
 // --- Output Message Generator ---
