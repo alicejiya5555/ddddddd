@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Telegram bot for Binance crypto analysis with technical indicators",
   "main": "bot.js",
-  "type": "module",
   "scripts": {
     "start": "node bot.js",
     "dev": "nodemon bot.js"
