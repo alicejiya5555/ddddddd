@@ -65,7 +65,6 @@ function calculateIndicators(candles) {
   const low = candles.map(c => c.low);
   const volume = candles.map(c => c.volume);
 
-  // Helper to safely get last value or NaN if empty
   const lastValue = (arr) => arr.length ? arr.slice(-1)[0] : NaN;
 
   const macdRaw = ti.MACD.calculate({
@@ -85,18 +84,42 @@ function calculateIndicators(candles) {
   });
   const bb = lastValue(bbRaw) || { upper: 0, middle: 0, lower: 0 };
 
-  const atr14: formatNum(lastValue(ti.ATR.calculate({
-      high,
-      low,
-      close,
-      period: 14
-    }))),
-    
-    obv: formatNum(lastValue(ti.OBV.calculate({
-      close,
-      volume
-    }))),
+  return {
+    sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
+    sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
+    sma21: formatNum(lastValue(ti.SMA.calculate({ period: 21, values: close }))),
+    sma50: formatNum(lastValue(ti.SMA.calculate({ period: 50, values: close }))),
+    sma100: formatNum(lastValue(ti.SMA.calculate({ period: 100, values: close }))),
+    sma200: formatNum(lastValue(ti.SMA.calculate({ period: 200, values: close }))),
 
+    ema5: formatNum(lastValue(ti.EMA.calculate({ period: 5, values: close }))),
+    ema13: formatNum(lastValue(ti.EMA.calculate({ period: 13, values: close }))),
+    ema21: formatNum(lastValue(ti.EMA.calculate({ period: 21, values: close }))),
+    ema50: formatNum(lastValue(ti.EMA.calculate({ period: 50, values: close }))),
+    ema100: formatNum(lastValue(ti.EMA.calculate({ period: 100, values: close }))),
+    ema200: formatNum(lastValue(ti.EMA.calculate({ period: 200, values: close }))),
+
+    wma5: formatNum(lastValue(ti.WMA.calculate({ period: 5, values: close }))),
+    wma13: formatNum(lastValue(ti.WMA.calculate({ period: 13, values: close }))),
+    wma21: formatNum(lastValue(ti.WMA.calculate({ period: 21, values: close }))),
+    wma50: formatNum(lastValue(ti.WMA.calculate({ period: 50, values: close }))),
+    wma100: formatNum(lastValue(ti.WMA.calculate({ period: 100, values: close }))),
+
+    macdValue: formatNum(macd.MACD),
+    macdSignal: formatNum(macd.signal),
+    macdHistogram: formatNum(macd.histogram),
+
+    bbUpper: formatNum(bb.upper),
+    bbMiddle: formatNum(bb.middle),
+    bbLower: formatNum(bb.lower),
+
+    rsi5: formatNum(lastValue(ti.RSI.calculate({ period: 5, values: close }))),
+    rsi14: formatNum(lastValue(ti.RSI.calculate({ period: 14, values: close }))),
+
+    atr14: formatNum(lastValue(ti.ATR.calculate({ high, low, close, period: 14 }))),
+    obv: formatNum(lastValue(ti.OBV.calculate({ close, volume })))
+  };
+}
 
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
