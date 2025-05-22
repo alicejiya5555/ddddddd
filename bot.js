@@ -85,6 +85,19 @@ function calculateIndicators(candles) {
   });
   const bb = lastValue(bbRaw) || { upper: 0, middle: 0, lower: 0 };
 
+  const atr14: formatNum(lastValue(ti.ATR.calculate({
+      high,
+      low,
+      close,
+      period: 14
+    }))),
+    
+    obv: formatNum(lastValue(ti.OBV.calculate({
+      close,
+      volume
+    }))),
+
+
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
     sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
@@ -187,6 +200,13 @@ function generateOutput(priceData, indicators, name = "Symbol", tfLabel = "Timef
 `⚡ Relative Strength Index (RSI):
  - RSI (5): ${indicators.rsi5}
  - RSI (14): ${indicators.rsi14}
+
+`;
+
+  const atrObvSection =
+`📏 Volatility & Volume Indicators:
+ - ATR (14): ${indicators.atr14}
+ - OBV: ${indicators.obv}
 
 `;
 
