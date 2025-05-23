@@ -24,7 +24,7 @@ function parseCommand(command) {
   if (!symbol) return null;
 
   const validIntervals = ["15m", "1h", "4h", "12h", "24h"];
-  const interval = `${intervalNum}${intervalUnit}`;
+  const interval = ${intervalNum}${intervalUnit};
   if (!validIntervals.includes(interval)) return null;
 
   return { symbol, interval };
@@ -41,8 +41,8 @@ function formatNum(num) {
 // --- Binance Data Fetch ---
 async function getBinanceData(symbol, interval) {
   const [priceRes, candlesRes] = await Promise.all([
-    axios.get(`https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}`),
-    axios.get(`https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=200`)
+    axios.get(https://api.binance.com/api/v3/ticker/24hr?symbol=${symbol}),
+    axios.get(https://api.binance.com/api/v3/klines?symbol=${symbol}&interval=${interval}&limit=200)
   ]);
 
   const priceData = priceRes.data;
@@ -65,6 +65,7 @@ function calculateIndicators(candles) {
   const low = candles.map(c => c.low);
   const volume = candles.map(c => c.volume);
 
+  // Helper to safely get last value or NaN if empty
   const lastValue = (arr) => arr.length ? arr.slice(-1)[0] : NaN;
 
   const macdRaw = ti.MACD.calculate({
@@ -115,53 +116,13 @@ function calculateIndicators(candles) {
 
     rsi5: formatNum(lastValue(ti.RSI.calculate({ period: 5, values: close }))),
     rsi14: formatNum(lastValue(ti.RSI.calculate({ period: 14, values: close }))),
-
-    atr14: formatNum(lastValue(ti.ATR.calculate({ high, low, close, period: 14 }))),
-    obv: formatNum(lastValue(ti.OBV.calculate({ close, volume })))
   };
-}
-
-  return {
-    sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
-    sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
-    sma21: formatNum(lastValue(ti.SMA.calculate({ period: 21, values: close }))),
-    sma50: formatNum(lastValue(ti.SMA.calculate({ period: 50, values: close }))),
-    sma100: formatNum(lastValue(ti.SMA.calculate({ period: 100, values: close }))),
-    sma200: formatNum(lastValue(ti.SMA.calculate({ period: 200, values: close }))),
-
-    ema5: formatNum(lastValue(ti.EMA.calculate({ period: 5, values: close }))),
-    ema13: formatNum(lastValue(ti.EMA.calculate({ period: 13, values: close }))),
-    ema21: formatNum(lastValue(ti.EMA.calculate({ period: 21, values: close }))),
-    ema50: formatNum(lastValue(ti.EMA.calculate({ period: 50, values: close }))),
-    ema100: formatNum(lastValue(ti.EMA.calculate({ period: 100, values: close }))),
-    ema200: formatNum(lastValue(ti.EMA.calculate({ period: 200, values: close }))),
-
-    wma5: formatNum(lastValue(ti.WMA.calculate({ period: 5, values: close }))),
-    wma13: formatNum(lastValue(ti.WMA.calculate({ period: 13, values: close }))),
-    wma21: formatNum(lastValue(ti.WMA.calculate({ period: 21, values: close }))),
-    wma50: formatNum(lastValue(ti.WMA.calculate({ period: 50, values: close }))),
-    wma100: formatNum(lastValue(ti.WMA.calculate({ period: 100, values: close }))),
-
-    macdValue: formatNum(macd.MACD),
-    macdSignal: formatNum(macd.signal),
-    macdHistogram: formatNum(macd.histogram),
-
-    bbUpper: formatNum(bb.upper),
-    bbMiddle: formatNum(bb.middle),
-    bbLower: formatNum(bb.lower),
-
-    rsi5: formatNum(lastValue(ti.RSI.calculate({ period: 5, values: close }))),
-    rsi14: formatNum(lastValue(ti.RSI.calculate({ period: 14, values: close }))),
-
- atr14: formatNum(lastValue(ti.ATR.calculate({ high, low, close, period: 14 }))),
-  obv: formatNum(lastValue(ti.OBV.calculate({ close, volume }))),
-  });
 }
 
 // --- Output Message Generator ---
 function generateOutput(priceData, indicators, name = "Symbol", tfLabel = "Timeframe") {
   const header = 
-`📊 ${name} ${tfLabel} Analysis
+📊 ${name} ${tfLabel} Analysis
 
 💰 Price: $${formatNum(priceData.lastPrice)}
 📈 24h High: $${formatNum(priceData.highPrice)}
@@ -172,10 +133,10 @@ function generateOutput(priceData, indicators, name = "Symbol", tfLabel = "Timef
 🔓 Open Price: $${formatNum(priceData.openPrice)}
 ⏰ Close Time: ${new Date(priceData.closeTime).toLocaleString('en-UK')}
 
-`;
+;
 
   const smaSection = 
-`📊 Simple Moving Averages (SMA):
+📊 Simple Moving Averages (SMA):
  - SMA 5: $${indicators.sma5}
  - SMA 13: $${indicators.sma13}
  - SMA 21: $${indicators.sma21}
@@ -183,10 +144,10 @@ function generateOutput(priceData, indicators, name = "Symbol", tfLabel = "Timef
  - SMA 100: $${indicators.sma100}
  - SMA 200: $${indicators.sma200}
 
-`;
+;
 
   const emaSection =
-`📈 Exponential Moving Averages (EMA):
+📈 Exponential Moving Averages (EMA):
  - EMA 5: $${indicators.ema5}
  - EMA 13: $${indicators.ema13}
  - EMA 21: $${indicators.ema21}
@@ -194,51 +155,44 @@ function generateOutput(priceData, indicators, name = "Symbol", tfLabel = "Timef
  - EMA 100: $${indicators.ema100}
  - EMA 200: $${indicators.ema200}
 
-`;
+;
 
   const wmaSection =
-`⚖️ Weighted Moving Averages (WMA):
+⚖️ Weighted Moving Averages (WMA):
  - WMA 5: $${indicators.wma5}
  - WMA 13: $${indicators.wma13}
  - WMA 21: $${indicators.wma21}
  - WMA 50: $${indicators.wma50}
  - WMA 100: $${indicators.wma100}
 
-`;
+;
 
   const macdSection =
-`📉 MACD: 3,10,16
+📉 MACD: 3,10,16
  - MACD: ${indicators.macdValue}
  - Signal: ${indicators.macdSignal}
  - Histogram: ${indicators.macdHistogram}
 
-`;
+;
 
   const bbSection =
-`🎯 Bollinger Bands (20, 2 StdDev):
+🎯 Bollinger Bands (20, 2 StdDev):
  - Upper Band: $${indicators.bbUpper}
  - Middle Band: $${indicators.bbMiddle}
  - Lower Band: $${indicators.bbLower}
 
-`;
+;
 
   const rsiSection =
-`⚡ Relative Strength Index (RSI):
+⚡ Relative Strength Index (RSI):
  - RSI (5): ${indicators.rsi5}
  - RSI (14): ${indicators.rsi14}
 
-`;
-
-  const atrObvSection =
-`📏 Volatility & Volume Indicators:
- - ATR (14): ${indicators.atr14}
- - OBV: ${indicators.obv}
-
-`;
+;
 
   // Your added custom words here:
   const extraNotes =
-`
+
 Calculate and measure these values for best output
 
 📍 Final Signal Summary
@@ -260,15 +214,15 @@ Some Other Information if you can Provide:
 🧠 Strategy Type Suggestion
 📅 3-Day or Weekly Forecast
 
-`;
+;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + atrObvSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + extraNotes;
 }
 
 // --- Command Handler ---
 bot.on("text", async (ctx) => {
   const parsed = parseCommand(ctx.message.text);
-  if (!parsed) return ctx.reply("❌ Invalid format. Try `/eth1h`, `/btc15m`, `/link4h`");
+  if (!parsed) return ctx.reply("❌ Invalid format. Try /eth1h, /btc15m, /link4h");
 
   try {
     const { symbol, interval } = parsed;
@@ -291,6 +245,6 @@ bot.on("text", async (ctx) => {
 const app = express();
 app.get("/", (req, res) => res.send("Bot is running"));
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(Server running on port ${PORT});
   bot.launch();
 });
