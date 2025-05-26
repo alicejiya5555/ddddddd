@@ -658,8 +658,36 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + adsocsection + ichimokuSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
-}
+  return (
+  header +
+  '\n🔹 Moving Averages\n' +
+  smaSection +
+  emaSection +
+  wmaSection +
+  '\n📊 Momentum & Trend\n' +
+  macdSection +
+  bbSection +
+  rsiSection +
+  stochRsiSection +
+  kdjSection +
+  williamsSection +
+  cciSection +
+  rocSection +
+  mtmSection +
+  uoSection +
+  adxSection +
+  '\n📈 Volatility & Channels\n' +
+  keltnerSection +
+  atrSection +
+  vwapSection +
+  '\n🔍 Volume-Based\n' +
+  adsocSection +
+  mfiSection +
+  '\n🌥️ Cloud Analysis\n' +
+  ichimokuSection +
+  '\n📝 Notes\n' +
+  extraNotes
+);
 
 // --- Command Handler ---
 bot.on("text", async (ctx) => {
