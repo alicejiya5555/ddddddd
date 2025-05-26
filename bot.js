@@ -72,6 +72,52 @@ function getKeltnerChannel(candles, emaPeriod = 20, atrPeriod = 14, multiplier =
   };
 }
 
+function getIchimoku(candles) {
+  try {
+    if (candles.length < 52) return { tenkan: "N/A", kijun: "N/A", spanA: "N/A", spanB: "N/A", chikou: "N/A" };
+
+    const high = candles.map(c => c.high);
+    const low = candles.map(c => c.low);
+    const close = candles.map(c => c.close);
+
+    const max = (arr, len) => Math.max(...arr.slice(-len));
+    const min = (arr, len) => Math.min(...arr.slice(-len));
+
+    const tenkanHigh = max(high, 9);
+    const tenkanLow = min(low, 9);
+    const tenkan = ((tenkanHigh + tenkanLow) / 2).toFixed(2);
+
+    const kijunHigh = max(high, 26);
+    const kijunLow = min(low, 26);
+    const kijun = ((kijunHigh + kijunLow) / 2).toFixed(2);
+
+    const spanA = ((parseFloat(tenkan) + parseFloat(kijun)) / 2).toFixed(2);
+
+    const spanBHigh = max(high, 52);
+    const spanBLow = min(low, 52);
+    const spanB = ((spanBHigh + spanBLow) / 2).toFixed(2);
+
+    const chikou = close.length >= 26 ? close[close.length - 26].toFixed(2) : "N/A";
+
+    return {
+      tenkan,
+      kijun,
+      spanA,
+      spanB,
+      chikou
+    };
+  } catch (err) {
+    console.error("❌ Ichimoku Error:", err.message);
+    return {
+      tenkan: "N/A",
+      kijun: "N/A",
+      spanA: "N/A",
+      spanB: "N/A",
+      chikou: "N/A"
+    };
+  }
+}
+
 // --- Binance Data Fetch ---
 async function getBinanceData(symbol, interval) {
   const [priceRes, candlesRes] = await Promise.all([
@@ -290,31 +336,7 @@ const cci20 = lastValue(ti.CCI.calculate({
   close
 }));
 
-function getADOSC(candles, fast = 10, slow = 20) {
-  const high = candles.map(c => c.high);
-  const low = candles.map(c => c.low);
-  const close = candles.map(c => c.close);
-  const volume = candles.map(c => c.volume);
-
-  // Check if there's enough data
-  if (candles.length < slow + 1) return 0;
-
-  try {
-    const adosc = ti.ADOSC.calculate({
-      high,
-      low,
-      close,
-      volume,
-      fastPeriod: fast,
-      slowPeriod: slow
-    });
-
-    return adosc.length ? adosc[adosc.length - 1].toFixed(2) : 0;
-  } catch (err) {
-    console.error("ADOSC Error:", err.message);
-    return 0;
-  }
-}
+const ichimoku = getIchimoku(candles);
 
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
@@ -401,7 +423,13 @@ mtm14: getMTM(candles, 14),
 mtm20: getMTM(candles, 20),
 
 keltner: getKeltnerChannel(candles),
-adosc: getADOSC(candles),
+
+ // Add Ichimoku values here 👇
+  ichimokuTenkan: ichimoku.tenkan,
+  ichimokuKijun: ichimoku.kijun,
+  ichimokuSpanA: ichimoku.spanA,
+  ichimokuSpanB: ichimoku.spanB,
+  ichimokuChikou: ichimoku.chikou
   };
 }
 
@@ -556,9 +584,13 @@ const keltnerSection =
  - Lower Band: ${indicators.keltner.lower}
 `;
 
-const adoscSection = 
-`📈 Accumulation/Distribution Oscillator (ADOSC 3,10):
- - Value: ${indicators.adosc}
+const ichimokuSection = `
+☁️ Ichimoku Cloud:
+ - Tenkan-sen: ${indicators.ichimoku.tenkan}
+ - Kijun-sen: ${indicators.ichimoku.kijun}
+ - Senkou Span A: ${indicators.ichimoku.spanA}
+ - Senkou Span B: ${indicators.ichimoku.spanB}
+ - Chikou Span: ${indicators.ichimoku.chikou}
 `;
 
   // Your added custom words here:
@@ -591,7 +623,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + vwapSection + mfiSection + adoscSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + ichimokuSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
