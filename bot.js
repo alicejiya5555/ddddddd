@@ -184,6 +184,15 @@ const roc14 = lastValue(ti.ROC.calculate({
   values: close
 }));
 
+const uo = lastValue(ti.UO.calculate({
+  close,
+  high,
+  low,
+  short: 7,
+  medium: 14,
+  long: 28
+}));
+
 // 📉 WILLIAMS %R (14)
 function getWilliamsR(candles) {
   const highs = candles.slice(-14).map(c => parseFloat(c[2]));
@@ -288,6 +297,7 @@ williamsR14: formatNum(lastValue(ti.WilliamsR.calculate({
 
     vwap1: formatNum(vwap1),
     vwap5: formatNum(vwap5),
+    uo: formatNum(uo),
 
 // Add KDJ values here:
   kdjK: kdj.k,
@@ -434,6 +444,12 @@ const rocSection =
 
 `;
 
+const uoSection =
+`🧭 Ultimate Oscillator:
+ - UO (7,14,28): ${indicators.uo}
+
+`;
+
   // Your added custom words here:
   const extraNotes =
 `
@@ -464,7 +480,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + uoSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
