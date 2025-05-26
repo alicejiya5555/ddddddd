@@ -658,15 +658,16 @@ Some Other Information if you can Provide:
 
 `;
 
-  return (
+return (
   header +
-  '\n🔹 Moving Averages\n' +
+
+  // 🔹 Moving Averages
   smaSection +
   emaSection +
   wmaSection +
-  '\n📊 Momentum & Trend\n' +
+
+  // 🔸 Trend & Momentum Indicators
   macdSection +
-  bbSection +
   rsiSection +
   stochRsiSection +
   kdjSection +
@@ -676,16 +677,21 @@ Some Other Information if you can Provide:
   mtmSection +
   uoSection +
   adxSection +
-  '\n📈 Volatility & Channels\n' +
+
+  // 📊 Volatility & Channels
+  bbSection +
   keltnerSection +
   atrSection +
-  vwapSection +
-  '\n🔍 Volume-Based\n' +
+
+  // 🧮 Volume & Price Flow
   adsocSection +
   mfiSection +
-  '\n🌥️ Cloud Analysis\n' +
+  vwapSection +
+
+  // 🌥️ Ichimoku Cloud
   ichimokuSection +
-  '\n📝 Notes\n' +
+
+  // 📝 Notes or Summary
   extraNotes
 );
 
