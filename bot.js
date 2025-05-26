@@ -267,16 +267,19 @@ function getWilliamsR(candles) {
 }
 
 function getADOSC(candles, fast = 3, slow = 10) {
-  const high = candles.map(c => c.high);
-  const low = candles.map(c => c.low);
-  const close = candles.map(c => c.close);
-  const volume = candles.map(c => c.volume);
-
-  // Check if there's enough data
-  if (candles.length < slow + 1) return 0;
-
   try {
-    const adosc = ti.ADOSC.calculate({
+    const high = candles.map(c => c.high);
+    const low = candles.map(c => c.low);
+    const close = candles.map(c => c.close);
+    const volume = candles.map(c => c.volume);
+
+    // Ensure data is valid and sufficient
+    const allGood = [high, low, close, volume].every(arr =>
+      arr.every(v => typeof v === 'number' && !isNaN(v))
+    );
+    if (!allGood || candles.length < slow + 2) return "N/A";
+
+    const adoscData = ti.ADOSC.calculate({
       high,
       low,
       close,
@@ -285,10 +288,14 @@ function getADOSC(candles, fast = 3, slow = 10) {
       slowPeriod: slow
     });
 
-    return adosc.length ? adosc[adosc.length - 1].toFixed(2) : 0;
-  } catch (err) {
-    console.error("ADOSC Error:", err.message);
-    return 0;
+    const lastValue = adoscData.length ? adoscData[adoscData.length - 1] : null;
+    return lastValue !== null && !isNaN(lastValue)
+      ? lastValue.toFixed(2)
+      : "N/A";
+
+  } catch (error) {
+    console.error("❌ Error in getADOSC():", error.message);
+    return "N/A";
   }
 }
 
