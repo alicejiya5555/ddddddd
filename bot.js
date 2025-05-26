@@ -687,7 +687,7 @@ return
   ichimokuSection +
   // 📝 Notes or Summary
   extraNotes
-);
+)
 
 // --- Command Handler ---
 bot.on("text", async (ctx) => {
