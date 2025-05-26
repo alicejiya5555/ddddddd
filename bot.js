@@ -658,36 +658,8 @@ Some Other Information if you can Provide:
 
 `;
 
-return
-  header +
-  // 🔹 Moving Averages
-  smaSection +
-  emaSection +
-  wmaSection +
-  // 🔸 Trend & Momentum Indicators
-  macdSection +
-  rsiSection +
-  stochRsiSection +
-  kdjSection +
-  williamsSection +
-  cciSection +
-  rocSection +
-  mtmSection +
-  uoSection +
-  adxSection +
-  // 📊 Volatility & Channels
-  bbSection +
-  keltnerSection +
-  atrSection +
-  // 🧮 Volume & Price Flow
-  adsocSection +
-  mfiSection +
-  vwapSection +
-  // 🌥️ Ichimoku Cloud
-  ichimokuSection +
-  // 📝 Notes or Summary
-  extraNotes
-)
+ return header + smaSection + emaSection + wmaSection + macdSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + adxSection + bbSection + keltnerSection + atrSection + adsocsection + mfiSection + vwapSection + ichimokuSection + extraNotes;
+}
 
 // --- Command Handler ---
 bot.on("text", async (ctx) => {
