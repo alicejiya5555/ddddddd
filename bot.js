@@ -184,14 +184,16 @@ const roc14 = lastValue(ti.ROC.calculate({
   values: close
 }));
 
-const uo = lastValue(ti.UO.calculate({
+const uoRaw = ti.UO.calculate({
   close,
   high,
   low,
   short: 7,
   medium: 14,
   long: 28
-}));
+});
+
+const uo = lastValue(uoRaw) || 0;
 
 // 📉 WILLIAMS %R (14)
 function getWilliamsR(candles) {
