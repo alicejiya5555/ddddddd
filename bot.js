@@ -152,6 +152,33 @@ function getKDJ(candles) {
   };
 }
 
+// 📊 ICHIMOKU CLOUD
+function getIchimoku(candles) {
+  const high = candles.map(c => c.high);
+  const low = candles.map(c => c.low);
+
+  const period9 = 9;
+  const period26 = 26;
+  const period52 = 52;
+
+  const conversionLine = (Math.max(...high.slice(-period9)) + Math.min(...low.slice(-period9))) / 2;
+  const baseLine = (Math.max(...high.slice(-period26)) + Math.min(...low.slice(-period26))) / 2;
+  const spanA = (conversionLine + baseLine) / 2;
+
+  const spanB = (Math.max(...high.slice(-period52)) + Math.min(...low.slice(-period52))) / 2;
+  const laggingSpan = candles[candles.length - period26]?.close || 0;
+
+  return {
+    conversionLine: conversionLine.toFixed(2),
+    baseLine: baseLine.toFixed(2),
+    spanA: spanA.toFixed(2),
+    spanB: spanB.toFixed(2),
+    laggingSpan: laggingSpan.toFixed(2)
+  };
+}
+
+const ichimoku = getIchimoku(candles);
+
 // 📈 MOMENTUM (MTM) - 7, 14, 20
 function getMTM(candles, period) {
   if (candles.length <= period) return 'N/A';
@@ -421,6 +448,11 @@ keltner: getKeltnerChannel(candles),
 
 // other indicators...
   adosc: isNaN(adosc) ? "N/A" : adosc,
+
+ichimokuConversion: formatNum(ichimoku.conversion),
+ichimokuBase: formatNum(ichimoku.base),
+ichimokuSpanA: formatNum(ichimoku.spanA),
+ichimokuSpanB: formatNum(ichimoku.spanB),
   };
 }
 
@@ -579,6 +611,15 @@ const adsocsection = `
 📊 ADOSC: ${indicators.adosc}
 `;
 
+const ichimokuSection = `
+☁️ Ichimoku Cloud:
+ - Conversion Line (Tenkan-sen): ${indicators.ichimoku.conversionLine}
+ - Base Line (Kijun-sen): ${indicators.ichimoku.baseLine}
+ - Leading Span A (Senkou A): ${indicators.ichimoku.spanA}
+ - Leading Span B (Senkou B): ${indicators.ichimoku.spanB}
+ - Lagging Span (Chikou): ${indicators.ichimoku.laggingSpan}
+`;
+
   // Your added custom words here:
   const extraNotes =
 `
@@ -609,7 +650,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + adsocsection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + adsocsection + ichimokuSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
