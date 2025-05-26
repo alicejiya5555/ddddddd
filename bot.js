@@ -137,19 +137,6 @@ function getKDJ(candles) {
   };
 }
 
-function getADOSC(candles, fast = 3, slow = 10) {
-  const close = candles.map(c => c.close);
-  const high = candles.map(c => c.high);
-  const low = candles.map(c => c.low);
-  const volume = candles.map(c => c.volume);
-
-  const input = { high, low, close, volume, fastPeriod: fast, slowPeriod: slow };
-  const adosc = ti.ADOSC.calculate(input);
-  const lastValue = adosc.length ? adosc[adosc.length - 1] : 0;
-
-  return lastValue.toFixed(2);
-}
-
 // 📈 MOMENTUM (MTM) - 7, 14, 20
 function getMTM(candles, period) {
   if (candles.length <= period) return 'N/A';
@@ -277,6 +264,32 @@ function getWilliamsR(candles) {
 
   const williamsR = ((highestHigh - close) / (highestHigh - lowestLow)) * -100;
   return williamsR.toFixed(2);
+}
+
+function getADOSC(candles, fast = 3, slow = 10) {
+  const high = candles.map(c => c.high);
+  const low = candles.map(c => c.low);
+  const close = candles.map(c => c.close);
+  const volume = candles.map(c => c.volume);
+
+  // Check if there's enough data
+  if (candles.length < slow + 1) return 0;
+
+  try {
+    const adosc = ti.ADOSC.calculate({
+      high,
+      low,
+      close,
+      volume,
+      fastPeriod: fast,
+      slowPeriod: slow
+    });
+
+    return adosc.length ? adosc[adosc.length - 1].toFixed(2) : 0;
+  } catch (err) {
+    console.error("ADOSC Error:", err.message);
+    return 0;
+  }
 }
 
 // 📊 KDJ indicator calculation
@@ -543,8 +556,8 @@ const keltnerSection =
  - Lower Band: ${indicators.keltner.lower}
 `;
 
-const adoscSection =
-`📈 ADOSC (3,10):
+const adoscSection = 
+`📈 Accumulation/Distribution Oscillator (ADOSC 3,10):
  - Value: ${indicators.adosc}
 `;
 
