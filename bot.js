@@ -118,6 +118,47 @@ function getKDJ(candles) {
     j: J.toFixed(2),
   };
 }
+
+// 🧭 ULTIMATE OSCILLATOR (7,14,28)
+function getUltimateOscillator(candles) {
+  if (candles.length < 28) return 'N/A';
+
+  const bp = [];
+  const tr = [];
+
+  for (let i = 1; i < candles.length; i++) {
+    const curr = candles[i];
+    const prev = candles[i - 1];
+
+    const high = curr.high;
+    const low = curr.low;
+    const closePrev = prev.close;
+
+    const trueLow = Math.min(low, closePrev);
+    const trueHigh = Math.max(high, closePrev);
+
+    const buyingPressure = curr.close - trueLow;
+    const trueRange = trueHigh - trueLow;
+
+    bp.push(buyingPressure);
+    tr.push(trueRange);
+  }
+
+  function avg(sumArray, period) {
+    const slicedBP = bp.slice(-period);
+    const slicedTR = tr.slice(-period);
+    const sumBP = slicedBP.reduce((a, b) => a + b, 0);
+    const sumTR = slicedTR.reduce((a, b) => a + b, 0);
+    return sumTR === 0 ? 0 : sumBP / sumTR;
+  }
+
+  const avg7 = avg(bp, 7);
+  const avg14 = avg(bp, 14);
+  const avg28 = avg(bp, 28);
+
+  const uo = 100 * ((4 * avg7) + (2 * avg14) + avg28) / 7;
+  return uo.toFixed(2);
+}
 // --- Indicator Calculations ---
 function calculateIndicators(candles) {
   const close = candles.map(c => c.close);
@@ -183,17 +224,6 @@ const roc14 = lastValue(ti.ROC.calculate({
   period: 14,
   values: close
 }));
-
-const uoRaw = ti.UO.calculate({
-  close,
-  high,
-  low,
-  short: 7,
-  medium: 14,
-  long: 28
-});
-
-const uo = lastValue(uoRaw) || 0;
 
 // 📉 WILLIAMS %R (14)
 function getWilliamsR(candles) {
@@ -299,7 +329,6 @@ williamsR14: formatNum(lastValue(ti.WilliamsR.calculate({
 
     vwap1: formatNum(vwap1),
     vwap5: formatNum(vwap5),
-    uo: formatNum(uo),
 
 // Add KDJ values here:
   kdjK: kdj.k,
@@ -311,6 +340,7 @@ cci10: formatNum(cci10),
 cci20: formatNum(cci20),
 
 roc14: formatNum(roc14),
+uo: getUltimateOscillator(candles),
   };
 }
 
@@ -449,7 +479,6 @@ const rocSection =
 const uoSection =
 `🧭 Ultimate Oscillator:
  - UO (7,14,28): ${indicators.uo}
-
 `;
 
   // Your added custom words here:
