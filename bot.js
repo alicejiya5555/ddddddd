@@ -290,6 +290,32 @@ const cci20 = lastValue(ti.CCI.calculate({
   close
 }));
 
+function getADOSC(candles, fast = 3, slow = 10) {
+  const high = candles.map(c => c.high);
+  const low = candles.map(c => c.low);
+  const close = candles.map(c => c.close);
+  const volume = candles.map(c => c.volume);
+
+  // Check if there's enough data
+  if (candles.length < slow + 1) return 0;
+
+  try {
+    const adosc = ti.ADOSC.calculate({
+      high,
+      low,
+      close,
+      volume,
+      fastPeriod: fast,
+      slowPeriod: slow
+    });
+
+    return adosc.length ? adosc[adosc.length - 1].toFixed(2) : 0;
+  } catch (err) {
+    console.error("ADOSC Error:", err.message);
+    return 0;
+  }
+}
+
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
     sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
@@ -375,6 +401,7 @@ mtm14: getMTM(candles, 14),
 mtm20: getMTM(candles, 20),
 
 keltner: getKeltnerChannel(candles),
+adosc: getADOSC(candles),
   };
 }
 
@@ -529,6 +556,11 @@ const keltnerSection =
  - Lower Band: ${indicators.keltner.lower}
 `;
 
+const adoscSection = 
+`📈 Accumulation/Distribution Oscillator (ADOSC 3,10):
+ - Value: ${indicators.adosc}
+`;
+
   // Your added custom words here:
   const extraNotes =
 `
@@ -559,7 +591,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + vwapSection + mfiSection + adoscSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
