@@ -72,52 +72,6 @@ function getKeltnerChannel(candles, emaPeriod = 20, atrPeriod = 14, multiplier =
   };
 }
 
-function getIchimoku(candles) {
-  try {
-    if (candles.length < 52) return { tenkan: "N/A", kijun: "N/A", spanA: "N/A", spanB: "N/A", chikou: "N/A" };
-
-    const high = candles.map(c => c.high);
-    const low = candles.map(c => c.low);
-    const close = candles.map(c => c.close);
-
-    const max = (arr, len) => Math.max(...arr.slice(-len));
-    const min = (arr, len) => Math.min(...arr.slice(-len));
-
-    const tenkanHigh = max(high, 9);
-    const tenkanLow = min(low, 9);
-    const tenkan = ((tenkanHigh + tenkanLow) / 2).toFixed(2);
-
-    const kijunHigh = max(high, 26);
-    const kijunLow = min(low, 26);
-    const kijun = ((kijunHigh + kijunLow) / 2).toFixed(2);
-
-    const spanA = ((parseFloat(tenkan) + parseFloat(kijun)) / 2).toFixed(2);
-
-    const spanBHigh = max(high, 52);
-    const spanBLow = min(low, 52);
-    const spanB = ((spanBHigh + spanBLow) / 2).toFixed(2);
-
-    const chikou = close.length >= 26 ? close[close.length - 26].toFixed(2) : "N/A";
-
-    return {
-      tenkan,
-      kijun,
-      spanA,
-      spanB,
-      chikou
-    };
-  } catch (err) {
-    console.error("❌ Ichimoku Error:", err.message);
-    return {
-      tenkan: "N/A",
-      kijun: "N/A",
-      spanA: "N/A",
-      spanB: "N/A",
-      chikou: "N/A"
-    };
-  }
-}
-
 // --- Binance Data Fetch ---
 async function getBinanceData(symbol, interval) {
   const [priceRes, candlesRes] = await Promise.all([
@@ -312,6 +266,38 @@ function getWilliamsR(candles) {
   return williamsR.toFixed(2);
 }
 
+// 📉 ADOSC (Accumulation/Distribution Oscillator)
+function getADOSC(candles, fastPeriod = 3, slowPeriod = 10) {
+  if (candles.length < slowPeriod) return NaN;
+
+  const adl = [];
+  let prevAdl = 0;
+
+  for (let i = 0; i < candles.length; i++) {
+    const c = candles[i];
+    const high = c.high;
+    const low = c.low;
+    const close = c.close;
+    const volume = c.volume;
+
+    const hlDiff = high - low;
+    const clv = hlDiff === 0 ? 0 : ((close - low) - (high - close)) / hlDiff;
+    const moneyFlowVolume = clv * volume;
+    const currentAdl = prevAdl + moneyFlowVolume;
+
+    adl.push(currentAdl);
+    prevAdl = currentAdl;
+  }
+
+  const fastEMA = getEMA(adl, fastPeriod);
+  const slowEMA = getEMA(adl, slowPeriod);
+
+  if (!fastEMA.length || !slowEMA.length) return NaN;
+
+  const adosc = fastEMA[fastEMA.length - 1] - slowEMA[slowEMA.length - 1];
+  return adosc.toFixed(2);
+}
+
 // 📊 KDJ indicator calculation
 const kdj = getKDJ(candles);
 
@@ -336,8 +322,8 @@ const cci20 = lastValue(ti.CCI.calculate({
   close
 }));
 
-const ichimoku = getIchimoku(candles);
-
+const adosc = getADOSC(candles);
+  
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
     sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
@@ -423,13 +409,7 @@ mtm14: getMTM(candles, 14),
 mtm20: getMTM(candles, 20),
 
 keltner: getKeltnerChannel(candles),
-
- // Add Ichimoku values here 👇
-  ichimokuTenkan: ichimoku.tenkan,
-  ichimokuKijun: ichimoku.kijun,
-  ichimokuSpanA: ichimoku.spanA,
-  ichimokuSpanB: ichimoku.spanB,
-  ichimokuChikou: ichimoku.chikou
+adosc: formatNum(adosc),
   };
 }
 
@@ -584,13 +564,8 @@ const keltnerSection =
  - Lower Band: ${indicators.keltner.lower}
 `;
 
-const ichimokuSection = `
-☁️ Ichimoku Cloud:
- - Tenkan-sen: ${indicators.ichimoku.tenkan}
- - Kijun-sen: ${indicators.ichimoku.kijun}
- - Senkou Span A: ${indicators.ichimoku.spanA}
- - Senkou Span B: ${indicators.ichimoku.spanB}
- - Chikou Span: ${indicators.ichimoku.chikou}
+const adoscSection =
+`📊 ADOSC: ${indicators.adosc}
 `;
 
   // Your added custom words here:
@@ -623,7 +598,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + ichimokuSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + adoscSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
