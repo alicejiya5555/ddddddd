@@ -658,7 +658,7 @@ Some Other Information if you can Provide:
 
 `;
 
-return (
+return
   header +
   // 🔹 Moving Averages
   smaSection +
