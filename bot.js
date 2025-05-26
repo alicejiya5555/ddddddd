@@ -631,9 +631,7 @@ const ichimokuSection =
   // Your added custom words here:
   const extraNotes =
 `
-Calculate and measure these values for best output
-
-Calculate Values of all other Indicators
+Calculate Values of all thes Indicatotors and Give me Out Put:
 📍 Final Signal Summary
 📉 Trend Direction
 📊 Indicator Behavior Breakdown
@@ -644,17 +642,19 @@ Calculate Values of all other Indicators
 ⏳ Multi-Timeframe Comparison
 🐋 Whale vs Retail Movement
 🕯 Candle Pattern Alerts
-🕰 Best UTC Entry & Exit Times
+🔵Is there a reversal pattern forming?
+🕰 Best UTC(+07:00) Entry & Exit Times
 🔮 Short-Term & Mid-Term Price Prediction
 🛡 Entry Zone, Take Profit, Stop Loss
-📢 Final Trade Advice (Mindset + Strategy)
 🔵Mostly of the Chances for Hit Tp1 or T2 or T3 suggest 1
 🔵IF I take profit on TP1, or 2, Where should I take my next position
-🔵Chances for go more up or now it's a small or big reserve time
-Some Other Information if you can Provide:
+🛡 Profitable buy and sell Price,
 🔁 Reversal vs Continuation Clarity
+⏳ How many minutes or hours can this signal be used for?
+📢 Final Trade Advice (Mindset + Strategy)
 🧠 Strategy Type Suggestion
 📅 3-Day or Weekly Forecast
+📅 Is there any news or Update about Crypto that can Effect,
 
 `;
 
