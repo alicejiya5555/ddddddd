@@ -54,6 +54,24 @@ function calcVWAP(candles, period) {
   return vwapArray[vwapArray.length - 1]; // latest VWAP
 }
 
+function getKeltnerChannel(candles, emaPeriod = 20, atrPeriod = 14, multiplier = 2) {
+  const close = candles.map(c => c.close);
+  const high = candles.map(c => c.high);
+  const low = candles.map(c => c.low);
+
+  const emaArray = ti.EMA.calculate({ period: emaPeriod, values: close });
+  const atrArray = ti.ATR.calculate({ period: atrPeriod, high, low, close });
+
+  const ema = emaArray.length ? emaArray[emaArray.length - 1] : 0;
+  const atr = atrArray.length ? atrArray[atrArray.length - 1] : 0;
+
+  return {
+    upper: (ema + multiplier * atr).toFixed(2),
+    middle: ema.toFixed(2),
+    lower: (ema - multiplier * atr).toFixed(2)
+  };
+}
+
 // --- Binance Data Fetch ---
 async function getBinanceData(symbol, interval) {
   const [priceRes, candlesRes] = await Promise.all([
@@ -355,6 +373,8 @@ uo: getUltimateOscillator(candles),
 mtm7: getMTM(candles, 7),
 mtm14: getMTM(candles, 14),
 mtm20: getMTM(candles, 20),
+
+keltner: getKeltnerChannel(candles),
   };
 }
 
@@ -502,6 +522,13 @@ const mtmSection =
  - MTM (20): ${indicators.mtm20}
 `;
 
+const keltnerSection =
+`📐 Keltner Channel (20 EMA, 2 ATR):
+ - Upper Band: ${indicators.keltner.upper}
+ - Middle EMA: ${indicators.keltner.middle}
+ - Lower Band: ${indicators.keltner.lower}
+`;
+
   // Your added custom words here:
   const extraNotes =
 `
@@ -532,7 +559,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
