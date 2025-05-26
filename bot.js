@@ -72,6 +72,21 @@ function getKeltnerChannel(candles, emaPeriod = 20, atrPeriod = 14, multiplier =
   };
 }
 
+// 🔧 EMA Helper Function (required by ADOSC)
+function getEMA(values, period) {
+  const k = 2 / (period + 1);
+  const emaArray = [];
+  let ema = values[0];
+  emaArray.push(ema);
+
+  for (let i = 1; i < values.length; i++) {
+    ema = values[i] * k + ema * (1 - k);
+    emaArray.push(ema);
+  }
+
+  return emaArray;
+}
+
 // --- Binance Data Fetch ---
 async function getBinanceData(symbol, interval) {
   const [priceRes, candlesRes] = await Promise.all([
@@ -145,6 +160,32 @@ function getMTM(candles, period) {
   const pastClose = candles[candles.length - 1 - period].close;
   const mtm = currentClose - pastClose;
   return mtm.toFixed(2);
+}
+
+// 📉 ADOSC (Accumulation/Distribution Oscillator)
+function getADOSC(candles, fastPeriod = 3, slowPeriod = 10) {
+  if (candles.length < slowPeriod) return NaN;
+
+  const adl = [];
+  let prevAdl = 0;
+
+  for (let i = 0; i < candles.length; i++) {
+    const { high, low, close, volume } = candles[i];
+    const hlDiff = high - low;
+    const clv = hlDiff === 0 ? 0 : ((close - low) - (high - close)) / hlDiff;
+    const moneyFlowVolume = clv * volume;
+    const currentAdl = prevAdl + moneyFlowVolume;
+    adl.push(currentAdl);
+    prevAdl = currentAdl;
+  }
+
+  const fastEMA = getEMA(adl, fastPeriod);
+  const slowEMA = getEMA(adl, slowPeriod);
+
+  if (!fastEMA.length || !slowEMA.length) return NaN;
+
+  const adosc = fastEMA[fastEMA.length - 1] - slowEMA[slowEMA.length - 1];
+  return adosc.toFixed(2);
 }
 
 // 🧭 ULTIMATE OSCILLATOR (7,14,28)
@@ -290,6 +331,8 @@ const cci20 = lastValue(ti.CCI.calculate({
   close
 }));
 
+const adosc = getADOSC(candles);
+  
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
     sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
@@ -375,6 +418,9 @@ mtm14: getMTM(candles, 14),
 mtm20: getMTM(candles, 20),
 
 keltner: getKeltnerChannel(candles),
+
+// other indicators...
+  adosc: isNaN(adosc) ? "N/A" : adosc,
   };
 }
 
@@ -529,6 +575,10 @@ const keltnerSection =
  - Lower Band: ${indicators.keltner.lower}
 `;
 
+const adsocsection = `
+📊 ADOSC: ${indicators.adosc}
+`;
+
   // Your added custom words here:
   const extraNotes =
 `
@@ -559,7 +609,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + adsocsection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
