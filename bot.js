@@ -360,6 +360,22 @@ const cci20 = lastValue(ti.CCI.calculate({
 
 const adosc = getADOSC(candles);
   
+const ichimokuRaw = ti.IchimokuCloud.calculate({
+  high: high,
+  low: low,
+  conversionPeriod: 9,
+  basePeriod: 26,
+  spanPeriod: 52,
+  displacement: 26
+});
+
+const ichimoku = lastValue(ichimokuRaw) || {
+  conversion: 0,
+  base: 0,
+  spanA: 0,
+  spanB: 0
+};
+
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
     sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
