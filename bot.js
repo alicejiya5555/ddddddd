@@ -119,6 +119,16 @@ function getKDJ(candles) {
   };
 }
 
+// 📈 MOMENTUM (MTM) - 7, 14, 20
+function getMTM(candles, period) {
+  if (candles.length <= period) return 'N/A';
+
+  const currentClose = candles[candles.length - 1].close;
+  const pastClose = candles[candles.length - 1 - period].close;
+  const mtm = currentClose - pastClose;
+  return mtm.toFixed(2);
+}
+
 // 🧭 ULTIMATE OSCILLATOR (7,14,28)
 function getUltimateOscillator(candles) {
   if (candles.length < 28) return 'N/A';
@@ -341,6 +351,10 @@ cci20: formatNum(cci20),
 
 roc14: formatNum(roc14),
 uo: getUltimateOscillator(candles),
+
+mtm7: getMTM(candles, 7),
+mtm14: getMTM(candles, 14),
+mtm20: getMTM(candles, 20),
   };
 }
 
@@ -481,6 +495,13 @@ const uoSection =
  - UO (7,14,28): ${indicators.uo}
 `;
 
+const mtmSection =
+`📈 Momentum (MTM):
+ - MTM (7): ${indicators.mtm7}
+ - MTM (14): ${indicators.mtm14}
+ - MTM (20): ${indicators.mtm20}
+`;
+
   // Your added custom words here:
   const extraNotes =
 `
@@ -511,7 +532,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + uoSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
