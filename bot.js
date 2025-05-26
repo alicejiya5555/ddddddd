@@ -266,38 +266,6 @@ function getWilliamsR(candles) {
   return williamsR.toFixed(2);
 }
 
-// 📉 ADOSC (Accumulation/Distribution Oscillator)
-function getADOSC(candles, fastPeriod = 3, slowPeriod = 10) {
-  if (candles.length < slowPeriod) return NaN;
-
-  const adl = [];
-  let prevAdl = 0;
-
-  for (let i = 0; i < candles.length; i++) {
-    const c = candles[i];
-    const high = c.high;
-    const low = c.low;
-    const close = c.close;
-    const volume = c.volume;
-
-    const hlDiff = high - low;
-    const clv = hlDiff === 0 ? 0 : ((close - low) - (high - close)) / hlDiff;
-    const moneyFlowVolume = clv * volume;
-    const currentAdl = prevAdl + moneyFlowVolume;
-
-    adl.push(currentAdl);
-    prevAdl = currentAdl;
-  }
-
-  const fastEMA = getEMA(adl, fastPeriod);
-  const slowEMA = getEMA(adl, slowPeriod);
-
-  if (!fastEMA.length || !slowEMA.length) return NaN;
-
-  const adosc = fastEMA[fastEMA.length - 1] - slowEMA[slowEMA.length - 1];
-  return adosc.toFixed(2);
-}
-
 // 📊 KDJ indicator calculation
 const kdj = getKDJ(candles);
 
@@ -322,8 +290,6 @@ const cci20 = lastValue(ti.CCI.calculate({
   close
 }));
 
-const adosc = getADOSC(candles);
-  
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
     sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
@@ -409,7 +375,6 @@ mtm14: getMTM(candles, 14),
 mtm20: getMTM(candles, 20),
 
 keltner: getKeltnerChannel(candles),
-adosc: formatNum(adosc),
   };
 }
 
@@ -564,10 +529,6 @@ const keltnerSection =
  - Lower Band: ${indicators.keltner.lower}
 `;
 
-const adoscSection =
-`📊 ADOSC: ${indicators.adosc}
-`;
-
   // Your added custom words here:
   const extraNotes =
 `
@@ -598,7 +559,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + adoscSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
