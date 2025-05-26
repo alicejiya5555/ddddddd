@@ -651,6 +651,8 @@ Calculate Values of all thes Indicatotors and Give me Out Put:
 🛡 Profitable buy and sell Price,
 🔁 Reversal vs Continuation Clarity
 ⏳ How many minutes or hours can this signal be used for?
+🧠 Market Behavior is positive, Negative or Neautral.
+🔵 What is the percentage accuracy of this signal?
 📢 Final Trade Advice (Mindset + Strategy)
 🧠 Strategy Type Suggestion
 📅 3-Day or Weekly Forecast
