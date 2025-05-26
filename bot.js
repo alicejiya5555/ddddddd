@@ -660,12 +660,10 @@ Some Other Information if you can Provide:
 
 return (
   header +
-
   // 🔹 Moving Averages
   smaSection +
   emaSection +
   wmaSection +
-
   // 🔸 Trend & Momentum Indicators
   macdSection +
   rsiSection +
@@ -677,20 +675,16 @@ return (
   mtmSection +
   uoSection +
   adxSection +
-
   // 📊 Volatility & Channels
   bbSection +
   keltnerSection +
   atrSection +
-
   // 🧮 Volume & Price Flow
   adsocSection +
   mfiSection +
   vwapSection +
-
   // 🌥️ Ichimoku Cloud
   ichimokuSection +
-
   // 📝 Notes or Summary
   extraNotes
 );
