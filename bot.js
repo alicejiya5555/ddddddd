@@ -266,41 +266,6 @@ function getWilliamsR(candles) {
   return williamsR.toFixed(2);
 }
 
-function getADOSC(candles, fast = 3, slow = 10) {
-  try {
-    if (candles.length < slow + 2) return "N/A";
-
-    const high = candles.map(c => Number(c.high));
-    const low = candles.map(c => Number(c.low));
-    const close = candles.map(c => Number(c.close));
-    const volume = candles.map(c => Number(c.volume));
-
-    const valid = [high, low, close, volume].every(arr =>
-      arr.every(v => typeof v === 'number' && !isNaN(v))
-    );
-
-    if (!valid) return "N/A";
-
-    const adoscResult = ti.ADOSC.calculate({
-      high,
-      low,
-      close,
-      volume,
-      fastPeriod: fast,
-      slowPeriod: slow
-    });
-
-    const lastADOSC = adoscResult?.[adoscResult.length - 1];
-    return lastADOSC !== undefined && !isNaN(lastADOSC)
-      ? lastADOSC.toFixed(2)
-      : "N/A";
-
-  } catch (err) {
-    console.error("❌ ADOSC Error:", err.message);
-    return "N/A";
-  }
-}
-
 // 📊 KDJ indicator calculation
 const kdj = getKDJ(candles);
 
@@ -410,7 +375,6 @@ mtm14: getMTM(candles, 14),
 mtm20: getMTM(candles, 20),
 
 keltner: getKeltnerChannel(candles),
-adosc: getADOSC(candles),
   };
 }
 
@@ -565,11 +529,6 @@ const keltnerSection =
  - Lower Band: ${indicators.keltner.lower}
 `;
 
-const adoscSection = 
-`📈 Accumulation/Distribution Oscillator (ADOSC 3,10):
- - Value: ${indicators.adosc}
-`;
-
   // Your added custom words here:
   const extraNotes =
 `
@@ -600,7 +559,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + adoscSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
