@@ -290,7 +290,7 @@ const cci20 = lastValue(ti.CCI.calculate({
   close
 }));
 
-function getADOSC(candles, fast = 3, slow = 10) {
+function getADOSC(candles, fast = 10, slow = 20) {
   const high = candles.map(c => c.high);
   const low = candles.map(c => c.low);
   const close = candles.map(c => c.close);
