@@ -137,6 +137,19 @@ function getKDJ(candles) {
   };
 }
 
+function getADOSC(candles, fast = 3, slow = 10) {
+  const close = candles.map(c => c.close);
+  const high = candles.map(c => c.high);
+  const low = candles.map(c => c.low);
+  const volume = candles.map(c => c.volume);
+
+  const input = { high, low, close, volume, fastPeriod: fast, slowPeriod: slow };
+  const adosc = ti.ADOSC.calculate(input);
+  const lastValue = adosc.length ? adosc[adosc.length - 1] : 0;
+
+  return lastValue.toFixed(2);
+}
+
 // 📈 MOMENTUM (MTM) - 7, 14, 20
 function getMTM(candles, period) {
   if (candles.length <= period) return 'N/A';
@@ -375,6 +388,7 @@ mtm14: getMTM(candles, 14),
 mtm20: getMTM(candles, 20),
 
 keltner: getKeltnerChannel(candles),
+adosc: getADOSC(candles),
   };
 }
 
@@ -529,6 +543,11 @@ const keltnerSection =
  - Lower Band: ${indicators.keltner.lower}
 `;
 
+const adoscSection =
+`📈 ADOSC (3,10):
+ - Value: ${indicators.adosc}
+`;
+
   // Your added custom words here:
   const extraNotes =
 `
@@ -559,7 +578,7 @@ Some Other Information if you can Provide:
 
 `;
 
-  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
+  return header + smaSection + emaSection + wmaSection + macdSection + bbSection + rsiSection + stochRsiSection + kdjSection + williamsSection + cciSection + rocSection + mtmSection + uoSection + keltnerSection + adoscSection + vwapSection + mfiSection + atrSection + adxSection + extraNotes;
 }
 
 // --- Command Handler ---
