@@ -152,33 +152,6 @@ function getKDJ(candles) {
   };
 }
 
-// 📊 ICHIMOKU CLOUD
-function getIchimoku(candles) {
-  const high = candles.map(c => c.high);
-  const low = candles.map(c => c.low);
-
-  const period9 = 9;
-  const period26 = 26;
-  const period52 = 52;
-
-  const conversionLine = (Math.max(...high.slice(-period9)) + Math.min(...low.slice(-period9))) / 2;
-  const baseLine = (Math.max(...high.slice(-period26)) + Math.min(...low.slice(-period26))) / 2;
-  const spanA = (conversionLine + baseLine) / 2;
-
-  const spanB = (Math.max(...high.slice(-period52)) + Math.min(...low.slice(-period52))) / 2;
-  const laggingSpan = candles[candles.length - period26]?.close || 0;
-
-  return {
-    conversionLine: conversionLine.toFixed(2),
-    baseLine: baseLine.toFixed(2),
-    spanA: spanA.toFixed(2),
-    spanB: spanB.toFixed(2),
-    laggingSpan: laggingSpan.toFixed(2)
-  };
-}
-
-const ichimoku = getIchimoku(candles);
-
 // 📈 MOMENTUM (MTM) - 7, 14, 20
 function getMTM(candles, period) {
   if (candles.length <= period) return 'N/A';
@@ -261,7 +234,7 @@ function calculateIndicators(candles) {
   const high = candles.map(c => c.high);
   const low = candles.map(c => c.low);
   const volume = candles.map(c => c.volume);
-
+const ichimoku = getIchimoku(candles);
   // Helper to safely get last value or NaN if empty
   const lastValue = (arr) => arr.length ? arr.slice(-1)[0] : NaN;
 
@@ -334,6 +307,41 @@ function getWilliamsR(candles) {
   return williamsR.toFixed(2);
 }
 
+// 📉 ICHIMOKU (9, 26, 52)
+function getIchimoku(candles) {
+  const high = candles.map(c => c.high);
+  const low = candles.map(c => c.low);
+
+  const period9 = 9;
+  const period26 = 26;
+  const period52 = 52;
+
+  if (candles.length < period52) {
+    return { conversionLine: 'n/a', baseLine: 'n/a', leadingSpanA: 'n/a', leadingSpanB: 'n/a' };
+  }
+
+  const recentHigh9 = Math.max(...high.slice(-period9));
+  const recentLow9 = Math.min(...low.slice(-period9));
+  const conversionLine = ((recentHigh9 + recentLow9) / 2).toFixed(2);
+
+  const recentHigh26 = Math.max(...high.slice(-period26));
+  const recentLow26 = Math.min(...low.slice(-period26));
+  const baseLine = ((recentHigh26 + recentLow26) / 2).toFixed(2);
+
+  const leadingSpanA = (((parseFloat(conversionLine) + parseFloat(baseLine)) / 2)).toFixed(2);
+
+  const recentHigh52 = Math.max(...high.slice(-period52));
+  const recentLow52 = Math.min(...low.slice(-period52));
+  const leadingSpanB = ((recentHigh52 + recentLow52) / 2).toFixed(2);
+
+  return {
+    conversionLine,
+    baseLine,
+    leadingSpanA,
+    leadingSpanB
+  };
+}
+
 // 📊 KDJ indicator calculation
 const kdj = getKDJ(candles);
 
@@ -360,22 +368,6 @@ const cci20 = lastValue(ti.CCI.calculate({
 
 const adosc = getADOSC(candles);
   
-const ichimokuRaw = ti.IchimokuCloud.calculate({
-  high: high,
-  low: low,
-  conversionPeriod: 9,
-  basePeriod: 26,
-  spanPeriod: 52,
-  displacement: 26
-});
-
-const ichimoku = lastValue(ichimokuRaw) || {
-  conversion: 0,
-  base: 0,
-  spanA: 0,
-  spanB: 0
-};
-
   return {
     sma5: formatNum(lastValue(ti.SMA.calculate({ period: 5, values: close }))),
     sma13: formatNum(lastValue(ti.SMA.calculate({ period: 13, values: close }))),
@@ -465,10 +457,11 @@ keltner: getKeltnerChannel(candles),
 // other indicators...
   adosc: isNaN(adosc) ? "N/A" : adosc,
 
-ichimokuConversion: formatNum(ichimoku.conversion),
-ichimokuBase: formatNum(ichimoku.base),
-ichimokuSpanA: formatNum(ichimoku.spanA),
-ichimokuSpanB: formatNum(ichimoku.spanB),
+// other indicators...
+  ichimokuConversion: ichimoku.conversionLine,
+  ichimokuBase: ichimoku.baseLine,
+  ichimokuSpanA: ichimoku.leadingSpanA,
+  ichimokuSpanB: ichimoku.leadingSpanB,
   };
 }
 
@@ -627,13 +620,12 @@ const adsocsection = `
 📊 ADOSC: ${indicators.adosc}
 `;
 
-const ichimokuSection = `
-☁️ Ichimoku Cloud:
- - Conversion Line (Tenkan-sen): ${indicators.ichimoku.conversionLine}
- - Base Line (Kijun-sen): ${indicators.ichimoku.baseLine}
- - Leading Span A (Senkou A): ${indicators.ichimoku.spanA}
- - Leading Span B (Senkou B): ${indicators.ichimoku.spanB}
- - Lagging Span (Chikou): ${indicators.ichimoku.laggingSpan}
+const ichimokuSection = 
+`📊 Ichimoku Cloud:
+ - Conversion Line (9): ${indicators.ichimokuConversion}
+ - Base Line (26): ${indicators.ichimokuBase}
+ - Leading Span A: ${indicators.ichimokuSpanA}
+ - Leading Span B: ${indicators.ichimokuSpanB}
 `;
 
   // Your added custom words here:
